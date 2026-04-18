@@ -6,6 +6,7 @@ import iconGemini from '@/assets/icons/gemini.svg';
 import iconIflow from '@/assets/icons/iflow.svg';
 import iconKimiDark from '@/assets/icons/kimi-dark.svg';
 import iconKimiLight from '@/assets/icons/kimi-light.svg';
+import iconCursor from '@/assets/icons/cursor.svg';
 import iconQwen from '@/assets/icons/qwen.svg';
 import iconVertex from '@/assets/icons/vertex.svg';
 import type { AuthFileItem } from '@/types';
@@ -28,7 +29,7 @@ export type AuthFileModelItem = {
 };
 export type AuthFileIconAsset = string | { light: string; dark: string };
 
-export type QuotaProviderType = 'antigravity' | 'claude' | 'codex' | 'gemini-cli' | 'kimi';
+export type QuotaProviderType = 'antigravity' | 'claude' | 'codex' | 'gemini-cli' | 'kimi' | 'cursor';
 
 export const QUOTA_PROVIDER_TYPES = new Set<QuotaProviderType>([
   'antigravity',
@@ -36,6 +37,7 @@ export const QUOTA_PROVIDER_TYPES = new Set<QuotaProviderType>([
   'codex',
   'gemini-cli',
   'kimi',
+  'cursor',
 ]);
 
 export const MIN_CARD_PAGE_SIZE = 3;
@@ -57,6 +59,10 @@ export const TYPE_COLORS: Record<string, TypeColorSet> = {
   kimi: {
     light: { bg: '#dce8ff', text: '#0560cf' },
     dark: { bg: '#003880', text: '#70b5ff' },
+  },
+  cursor: {
+    light: { bg: '#ececec', text: '#111111' },
+    dark: { bg: '#2a2a2a', text: '#f3f3f3' },
   },
   // Gemini logo: 多色蓝 #3186FF（偏柔和的蓝）
   gemini: {
@@ -117,6 +123,7 @@ export const AUTH_FILE_ICONS: Record<string, AuthFileIconAsset> = {
   'gemini-cli': iconGemini,
   iflow: iconIflow,
   kimi: { light: iconKimiLight, dark: iconKimiDark },
+  cursor: iconCursor,
   qwen: iconQwen,
   vertex: iconVertex,
 };

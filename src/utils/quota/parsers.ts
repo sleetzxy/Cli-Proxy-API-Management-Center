@@ -2,7 +2,14 @@
  * Normalization and parsing functions for quota data.
  */
 
-import type { ClaudeUsagePayload, CodexUsagePayload, GeminiCliCodeAssistPayload, GeminiCliQuotaPayload, KimiUsagePayload } from '@/types';
+import type {
+  ClaudeUsagePayload,
+  CodexUsagePayload,
+  CursorQuotaRow,
+  GeminiCliCodeAssistPayload,
+  GeminiCliQuotaPayload,
+  KimiUsagePayload,
+} from '@/types';
 import { normalizeAuthIndex } from '@/utils/usage';
 
 const GEMINI_CLI_MODEL_SUFFIX = '_vertex';
@@ -223,4 +230,89 @@ export function parseKimiUsagePayload(payload: unknown): KimiUsagePayload | null
     return payload as KimiUsagePayload;
   }
   return null;
+}
+
+const CURSOR_USAGE_SKIP_KEYS = new Set([
+  'startofmonth',
+  'billingcyclestart',
+  'subscription',
+  'plan',
+  'membershiptype',
+  'metadata',
+  'user',
+  'team',
+]);
+
+function cursorUsageEntryUsed(entry: Record<string, unknown>): number | null {
+  const v =
+    normalizeNumberValue(entry.numRequests) ??
+    normalizeNumberValue(entry.num_requests) ??
+    normalizeNumberValue(entry.used) ??
+    normalizeNumberValue(entry.requests);
+  return v !== null ? Math.max(0, Math.floor(v)) : null;
+}
+
+function cursorUsageEntryLimit(entry: Record<string, unknown>): number | null {
+  const v =
+    normalizeNumberValue(entry.maxRequestUsage) ??
+    normalizeNumberValue(entry.max_request_usage) ??
+    normalizeNumberValue(entry.maxUsage) ??
+    normalizeNumberValue(entry.max_usage) ??
+    normalizeNumberValue(entry.limit);
+  if (v === null) return null;
+  const n = Math.floor(v);
+  return n < 0 ? 0 : n;
+}
+
+function isCursorUsageEntry(value: unknown): value is Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const o = value as Record<string, unknown>;
+  return (
+    cursorUsageEntryUsed(o) !== null ||
+    cursorUsageEntryLimit(o) !== null ||
+    typeof o.model === 'string' ||
+    typeof o.modelId === 'string' ||
+    typeof o.model_id === 'string'
+  );
+}
+
+/**
+ * Parses Cursor `GET https://api2.cursor.sh/auth/usage` JSON into quota rows.
+ * Shape varies by account; we accept per-model objects with request counts.
+ */
+export function parseCursorUsageRows(payload: unknown): CursorQuotaRow[] | null {
+  let root: Record<string, unknown> | null = null;
+  if (payload === undefined || payload === null) return null;
+  if (typeof payload === 'string') {
+    const trimmed = payload.trim();
+    if (!trimmed) return null;
+    try {
+      root = JSON.parse(trimmed) as Record<string, unknown>;
+    } catch {
+      return null;
+    }
+  } else if (typeof payload === 'object' && !Array.isArray(payload)) {
+    root = payload as Record<string, unknown>;
+  }
+  if (!root) return null;
+
+  const rows: CursorQuotaRow[] = [];
+  for (const [key, raw] of Object.entries(root)) {
+    const lk = key.trim().toLowerCase();
+    if (!lk || CURSOR_USAGE_SKIP_KEYS.has(lk)) continue;
+    if (!isCursorUsageEntry(raw)) continue;
+    const entry = raw as Record<string, unknown>;
+    const used = cursorUsageEntryUsed(entry) ?? 0;
+    const limit = cursorUsageEntryLimit(entry) ?? 0;
+    const labelFromModel =
+      (typeof entry.model === 'string' && entry.model.trim()) ||
+      (typeof entry.modelId === 'string' && entry.modelId.trim()) ||
+      (typeof entry.model_id === 'string' && entry.model_id.trim()) ||
+      '';
+    const label = labelFromModel || key;
+    rows.push({ id: `cursor-${key}`, label, used, limit });
+  }
+
+  rows.sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }));
+  return rows.length ? rows : null;
 }

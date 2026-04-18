@@ -480,6 +480,14 @@
   background-image: linear-gradient(180deg, rgba(220, 232, 255, 0.08), transparent);
 }
 
+.cursorCard {
+  background-image: linear-gradient(180deg, rgba(236, 236, 236, 0.12), transparent);
+}
+
+:global([data-theme='dark']) .cursorCard {
+  background-image: linear-gradient(180deg, rgba(42, 42, 42, 0.35), transparent);
+}
+
 .quotaSection {
   display: flex;
   flex-direction: column;

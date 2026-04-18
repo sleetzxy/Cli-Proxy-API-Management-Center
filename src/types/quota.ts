@@ -306,3 +306,18 @@ export interface KimiQuotaState {
   error?: string;
   errorStatus?: number;
 }
+
+/** Cursor /api2.cursor.sh auth usage (per-model request counts). */
+export interface CursorQuotaRow {
+  id: string;
+  label: string;
+  used: number;
+  limit: number;
+}
+
+export interface CursorQuotaState {
+  status: 'idle' | 'loading' | 'success' | 'error';
+  rows: CursorQuotaRow[];
+  error?: string;
+  errorStatus?: number;
+}

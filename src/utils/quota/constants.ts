@@ -38,6 +38,10 @@ export const TYPE_COLORS: Record<string, TypeColorSet> = {
     light: { bg: '#dce8ff', text: '#0560cf' },
     dark: { bg: '#003880', text: '#70b5ff' },
   },
+  cursor: {
+    light: { bg: '#ececec', text: '#111111' },
+    dark: { bg: '#2a2a2a', text: '#f3f3f3' },
+  },
   antigravity: {
     light: { bg: '#e0f7fa', text: '#006064' },
     dark: { bg: '#004d40', text: '#80deea' },
@@ -197,4 +201,12 @@ export const KIMI_USAGE_URL = 'https://api.kimi.com/coding/v1/usages';
 
 export const KIMI_REQUEST_HEADERS = {
   Authorization: 'Bearer $TOKEN$',
+};
+
+// Cursor (Anysphere) usage — JWT from cursor auth file
+export const CURSOR_USAGE_URL = 'https://api2.cursor.sh/auth/usage';
+
+export const CURSOR_REQUEST_HEADERS = {
+  Authorization: 'Bearer $TOKEN$',
+  Accept: 'application/json',
 };

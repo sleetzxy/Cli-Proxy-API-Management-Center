@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <!-- Cursor mark (Anysphere): simplified 2D cube for small UI; official assets: https://cursor.com/brand -->
+  <title>Cursor</title>
+  <path
+    fill="currentColor"
+    d="M12 2 3 7v10l9 5 9-5V7l-9-5Zm0 2.35L17.65 7 12 9.65 6.35 7 12 4.35ZM5 8.9l6 3.4v6.45L5 15.35V8.9Zm14 0v6.45l-6 3.35v-6.45l6-3.35Z"
+  />
+</svg>
